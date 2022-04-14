@@ -15,14 +15,15 @@ class Repository {
             return UserDatabase.getInstance(context)!!
         }
 
-        fun insert(context: Context,user: User) {
-            userDatabase= initializeDB(context)
+        fun insert(context: Context, user: User) {
+            userDatabase = initializeDB(context)
             CoroutineScope(IO).launch {
                 userDatabase?.getDao()?.insert(user)
             }
         }
-        fun getAllUserData(context: Context):LiveData<List<User>>? {
-            userDatabase= initializeDB(context)
+
+        fun getAllUserData(context: Context): LiveData<List<User>>? {
+            userDatabase = initializeDB(context)
             return userDatabase?.getDao()?.getAllData()
         }
     }
