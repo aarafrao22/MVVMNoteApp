@@ -12,7 +12,11 @@ import androidx.appcompat.app.AlertDialog
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.get
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
+import com.aarafrao.mvvm.Adapter.Adapter
 import com.aarafrao.mvvm.UserViewModel.UserViewModel
+import com.google.android.material.floatingactionbutton.FloatingActionButton
 import kotlinx.android.synthetic.main.activity_main.*
 
 class MainActivity : AppCompatActivity() {
@@ -23,15 +27,28 @@ class MainActivity : AppCompatActivity() {
     private lateinit var edName: EditText
     private lateinit var edAge: EditText
     private lateinit var btnSave: Button
-
+    private lateinit var userAdapter: Adapter
+    private lateinit var rvMain: RecyclerView
+    private lateinit var floatingActionButton: FloatingActionButton
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
+        floatingActionButton = findViewById(R.id.floatingActionButton)
+        rvMain = findViewById(R.id.rvMain)
+
+
+        userAdapter = Adapter(applicationContext, ArrayList<User>())
+        rvMain.apply {
+            setHasFixedSize(true)
+            layoutManager = LinearLayoutManager(this@MainActivity)
+            adapter = userAdapter
+        }
+
         userViewModel = ViewModelProvider(this)[UserViewModel::class.java]
         userViewModel.getAllUserData(applicationContext)?.observe(this, Observer {
-
+            userAdapter.setData(it as ArrayList<User>)
         })
 
         floatingActionButton.setOnClickListener {
@@ -59,7 +76,8 @@ class MainActivity : AppCompatActivity() {
         val getAge = edAge.text.toString().trim()
 
         if (!TextUtils.isEmpty(getName) && !TextUtils.isEmpty(getAge)) {
-
+            userViewModel.insert(this,User(getName,getAge as Int))
+            alertDialog.dismiss()
         } else {
             Toast.makeText(this, "Enter Something first", Toast.LENGTH_LONG).show()
             alertDialog.dismiss()
